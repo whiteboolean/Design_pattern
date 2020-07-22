@@ -6,6 +6,7 @@ import android.os.Handler
 import android.os.Looper
 import android.widget.ImageView
 import java.lang.Exception
+import java.lang.NullPointerException
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.concurrent.Executors
@@ -23,10 +24,10 @@ import java.util.concurrent.Executors
  * @UpdateRemark: 更新说明
  * @Version: 1.0
  */
-class ImageLoader  {
+class ImageLoader {
 
     //图片缓存
-    lateinit var mImageCache:ImageCache
+    lateinit var mImageCache: ImageCache
 
     //线程池，线程数量为CPU的数量
     val mExecutorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
@@ -43,6 +44,9 @@ class ImageLoader  {
 
     //加载图片
     fun displayImage(url: String, imageView: ImageView) {
+        if (!this::mImageCache.isInitialized) {
+            throw NullPointerException("您貌似还没有初始化缓存容器~")
+        }
         val bitmap = mImageCache.get(url)
         if (bitmap != null) {
             imageView.setImageBitmap(bitmap)
@@ -57,7 +61,6 @@ class ImageLoader  {
             mImageCache.put(url, bitmapDownload)
         }
     }
-
 
 
     private fun downloadImage(imageUrl: String): Bitmap? {
